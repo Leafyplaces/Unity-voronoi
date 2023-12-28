@@ -34,10 +34,6 @@ public class VParabola : VTreeNode
         iy += Mathf.Pow(focus.y, 2) - Mathf.Pow(newSite.y, 2);
         iy /= 2 * (focus.y - newSite.y);
 
-        //float iyF = (float)iy;
-        //int iyRI = Mathf.RoundToInt(iyF);
-        //int iyC = (int)iy;
-
         return (float)iy;
     }
 
@@ -146,15 +142,8 @@ public class VParabola : VTreeNode
                 float dist = Mathf.Sqrt(Mathf.Pow(intersection.x - focus.x, 2) + Mathf.Pow(intersection.y - focus.y, 2));
                 lineAtIntersection = intersection.y - dist;
 
-                Debug.Log("Found intersection at " + intersection + " with edges " + leftEdge.start + " + " + leftEdge.direction + " * a and "
-                    + rightEdge.start + " + " + rightEdge.direction + " * a, line is then at " + lineAtIntersection);
             }
         }
-
-        //if (hasIntersection && Mathf.RoundToInt(intersection.x) == 0)
-        //{
-        //    Debug.LogWarning("Wth");
-        //}
 
         return new Vector2(intersection.x, intersection.y);
     }
@@ -186,9 +175,7 @@ public class VParabola : VTreeNode
                 searchingLeaf = searchingEdge.rightChild;
             }
             leftArc = (VParabola)searchingLeaf;
-            Debug.Log("Next left arc has focus at " + leftArc.focus + ". Edge is " + leftEdge.start + " + m * " + leftEdge.direction);
         }
-        else { Debug.Log("Arc is leftmost arc."); }
 
         // Search for next right arc
         searchingEdge = parent;
@@ -208,9 +195,7 @@ public class VParabola : VTreeNode
                 searchingLeaf = searchingEdge.leftChild;
             }
             rightArc = (VParabola)searchingLeaf;
-            Debug.Log("Next right arc has focus at " + rightArc.focus + ". Edge is " + rightEdge.start + " + m * " + rightEdge.direction);
         }
-        else { Debug.Log("Arc is rightmost arc."); }
     }
 
     public void RemoveParabola(Vector2 intersection, ref VTreeNode root)
@@ -237,7 +222,6 @@ public class VParabola : VTreeNode
         else { otherSite = leftEdge.firstSite; }
 
         newEdge = new VEdge(oneSite, otherSite, intersection, parent.direction + otherEdge.direction, otherEdge.parent);
-        Debug.Log("New edge created: " + newEdge.start + " + a * " + newEdge.direction);
         otherEdge.leftChild.parent = newEdge;
         otherEdge.rightChild.parent = newEdge;
         newEdge.leftChild = otherEdge.leftChild;

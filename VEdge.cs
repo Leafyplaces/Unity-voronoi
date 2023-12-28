@@ -10,8 +10,6 @@ public class VEdge : VTreeNode
     public Vector2 start;
     public Vector2 end;
     public Vector2 direction;
-    //public float m;
-    //public float c;             // edge lies on f = mx + c
     public VEdge complement;
     public VTreeNode leftChild, rightChild;
 
@@ -35,8 +33,6 @@ public class VEdge : VTreeNode
         this.firstSite = firstSite;
         this.secondSite = secondSite;
         this.start = start;
-        //m = (rightSite.x - leftSite.x) / (rightSite.y - leftSite.y);
-        //c = start.y - m * start.x;
 
         // calculate vector from first to second site, negate one coordinate
         // complement edge must receive same sites but swapped
@@ -60,8 +56,6 @@ public class VEdge : VTreeNode
         // sqrt((site.x - end.x)^2 + (site.y - end.y)^2) = sqrt((end.y - yOfLine)^2)
         // inserting equations resolves in quadratic equation, one result is negative, return only result with positive e
 
-        //Debug.Log("Edge has start at " + start + ", direction of " + direction);
-        //Debug.Log("One site of edge is at " + firstSite + ". Line is at y = " + yOfLine);
         if (direction.x == 0)
         {
             if (firstSite.y == yOfLine) e = 1f;
@@ -83,11 +77,6 @@ public class VEdge : VTreeNode
             e2 = (-b - Mathf.Sqrt(b * b - 4 * a * c)) / (2 * a);
             e = Mathf.Max(e1, e2);
 
-            //float bControl = 2 * (direction.x * (start.x - secondSite.x) + direction.y * (yOfLine - secondSite.y));
-            //float cControl = Mathf.Pow(secondSite.x - start.x, 2) + Mathf.Pow(secondSite.y - start.y, 2) - Mathf.Pow(yOfLine - start.y, 2);
-            //float e1Control = (-bControl + Mathf.Sqrt(bControl * bControl - 4 * a * cControl)) / (2 * a);
-            //float e2Control = (-bControl - Mathf.Sqrt(bControl * bControl - 4 * a * cControl)) / (2 * a);
-
             if (e1 >= 0 && e2 <= 0) e = e1;
             else if (e2 >= 0 && e1 <= 0) e = e2;
             else
@@ -95,15 +84,9 @@ public class VEdge : VTreeNode
                 Debug.LogError("Unexpected result in x of current end calculation. Factors e are " + e1 + ", " + e2);
             }
         }
-        //Debug.Log("Calculated e of " + e);
 
         endX = start.x + e * direction.x;
         endY = start.y + e * direction.y;
-
-        if (float.IsNaN(e1) || float.IsNaN(e2))
-        {
-            Debug.LogError("How did this happen?! " + a + b + c + e1 + e2);
-        }
 
         return new Vector2(endX, endY);
     }

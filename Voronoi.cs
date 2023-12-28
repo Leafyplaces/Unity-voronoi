@@ -38,16 +38,6 @@ public class Voronoi
         // Iterate through all events until the queue is empty
         if (events.Count > 0)
         {
-            // Debugging:
-            Debug.Log(events.Count + " events left.");
-            string eventString = "";
-            foreach (VEvent e in events)
-            {
-                //eventString += e.newEvent.ToString() + " (" + e.yOfEvent + "), ";
-                eventString += e.newEvent.ToString() + ", ";
-            }
-            Debug.Log(eventString + " next event is " + events[0].newEvent.ToString());
-
             if (events[0].isNewSite)
             {
                 HandleSiteEvent(events[0]);
@@ -82,11 +72,6 @@ public class Voronoi
             yOfEvent = pos.y;
             sites.Add(Vector2Int.RoundToInt(pos));
         }
-        else
-        {
-            Debug.Log("Inserting new intersection event at " + pos);
-        }
-        // TODO: remove current event before calling this function to avoid extra parameter startIndex?
         // Insert events with declining y and growing x
         int insertIdx = startIndex;
         bool keepSearching = true;
@@ -107,15 +92,11 @@ public class Voronoi
         VEdge newLeftEdge;
         Vector2 newStart;
 
-        Debug.Log("Handling new site at " + eve.newEvent);
-
         if (root == null)
         {
             // Add new root node
             root = new VParabola(Vector2Int.RoundToInt(eve.newEvent), null);
-            Debug.Log("Adding root with focus " + eve.newEvent);
             nextNode = (VParabola)root;
-            // TODO: check if this can be done in a simpler way
             // If there are several nodes with the same y coordinate at the start, add all of them and save correct edges
             while (events[0].yOfEvent == events[1].yOfEvent)
             {
@@ -137,24 +118,17 @@ public class Voronoi
         }
         else
         {
-            if (Mathf.RoundToInt(eve.newEvent.x) == 259)
-            {
-                Debug.Log("Look here");
-            }
             // Search for parabole above new site
             VTreeNode parabolaAbove = root;
             while (parabolaAbove is VEdge edge)
             {
                 float xOfEdge = edge.GetCurrentEnd(eve.yOfEvent).x;
-                Debug.Log("Event is edge. Current end is at x = " + xOfEdge);
                 if (xOfEdge <= eve.newEvent.x)
                 {
-                    Debug.Log("End " + xOfEdge + " is smaller than new event " + eve.newEvent.x + ". Continuing search in the right child.");
                     parabolaAbove = edge.rightChild;
                 }
                 else
                 {
-                    Debug.Log("End " + xOfEdge + " is greater than new event " + eve.newEvent.x + ". Continuing search in the left child.");
                     parabolaAbove = edge.leftChild;
                 }
             }
@@ -168,7 +142,6 @@ public class Voronoi
                 }
 
                 float yOfIntersection = parabola.GetYOfIntersection(Vector2Int.RoundToInt(eve.newEvent));
-                Debug.Log("Splitting parabola with focus " + parabola.focus + " at x = " + eve.newEvent.x + " y = " + yOfIntersection);
                 // Replace the parabola above new site with two edges, the splitted parts and a new parabola
                 newLeftEdge = parabola.ReplaceWithNewNodes(yOfIntersection, Vector2Int.RoundToInt(eve.newEvent));
                 if (root is VParabola)
@@ -207,19 +180,16 @@ public class Voronoi
         Vector2 intersection = parabola.CheckForIntersection(ref newIntersection, ref yOfIntersection);
         if (newIntersection && Mathf.RoundToInt(yOfIntersection) <= Mathf.RoundToInt(sweepline))
         {
-            Debug.Log("Adding new intersection event");
             parabola.intersecEvent = InsertNewEvent(false, intersection, parabola, yOfIntersection, 1);
         }
         else
         {
             parabola.intersecEvent = null;
-            Debug.Log("Adding no new event");
         }
     }
 
     private void HandleIntersecEvent(VEvent eve)
     {
-        Debug.Log("Handling intersection at " + eve.newEvent);
         eve.parabolaNode.UpdateNeighbors();
         completeEdges.Add(eve.parabolaNode.leftEdge);
         completeEdges.Add(eve.parabolaNode.rightEdge);
